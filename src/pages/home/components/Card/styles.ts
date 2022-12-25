@@ -115,6 +115,8 @@ export const ButtonQuantity = styled.div`
   align-items: center;
   justify-content: center;
 
+  width: fit-content;
+
   background-color: ${(props) => props.theme["gray-300"]};
 
   padding: 0.8rem;

@@ -11,7 +11,8 @@ import {
 
 import { Minus, Plus, ShoppingCart } from "phosphor-react";
 import { useTheme } from "styled-components";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { PurchasesContext } from "../../../../context/PurchasesContext";
 
 interface CoffeeType {
   typeText: string;
@@ -33,9 +34,11 @@ export function Card({
   title,
   price,
   image,
+  id,
 }: CardProps) {
   const [coffeeQuantity, setCoffeeQuantity] = useState<number>(1);
 
+  const { addProductOnCart } = useContext(PurchasesContext);
   const colors = useTheme();
 
   const handleIncreaseQuantity = () => setCoffeeQuantity((state) => state + 1);
@@ -76,7 +79,17 @@ export function Card({
               size={16}
             />
           </ButtonQuantity>
-          <ShoppingCardButton>
+          <ShoppingCardButton
+            onClick={() => {
+              addProductOnCart({
+                quantity: coffeeQuantity,
+                image,
+                id,
+                price,
+                title,
+              });
+            }}
+          >
             <ShoppingCart
               weight={"fill"}
               color={colors["white-100"]}

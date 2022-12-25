@@ -60,4 +60,38 @@ export const PurchasesContainer = styled.div`
   border-radius: 6px;
 
   padding: 0.5rem;
+
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
+export const QuantityOnCart = styled.span`
+  background-color: ${(props) => props.theme["yellow-700"]};
+  color: ${(props) => props.theme["white-100"]};
+
+  font-family: "Roboto", sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 0.75rem;
+  line-height: 130%;
+
+  position: absolute;
+  right: 0;
+  top: 0;
+
+  width: 20px;
+  height: 20px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border: 0;
+  border-radius: 50%;
+
+  padding: 0.25rem 0 0;
+
+  margin-top: -0.625rem;
+  margin-right: -0.625rem;
 `;

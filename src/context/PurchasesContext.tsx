@@ -8,10 +8,17 @@ interface Coffee {
   id: string;
 }
 
+interface ChangeQuantityParams {
+  productId: string;
+  quantity: number;
+}
+
 interface PurchasesContextType {
   quantityProducts: number;
   productsOnCart: Coffee[];
   addProductOnCart: (product: Coffee) => void;
+  changeQuantityOfProduct: (data: ChangeQuantityParams) => void;
+  removeProduct: (productId: string) => void;
 }
 
 export const PurchasesContext = createContext({} as PurchasesContextType);
@@ -35,12 +42,39 @@ export function PurchasesContextProvider({
     });
   }
 
+  function changeQuantityProduct({
+    productId,
+    quantity,
+  }: ChangeQuantityParams) {
+    const coffeeChanged = coffees.map((coffee) => {
+      if (productId === coffee.id) coffee.quantity += quantity;
+
+      return coffee;
+    });
+
+    setCoffees(() => {
+      const coffeeQuantityGreaterThanOne = coffeeChanged.filter(
+        (coffee) => !(coffee.quantity < 1)
+      );
+      setQuantityProducts(coffeeQuantityGreaterThanOne.length);
+      return coffeeQuantityGreaterThanOne;
+    });
+  }
+
+  function removeProduct(productId: string) {
+    const productFiltered = coffees.filter((coffee) => coffee.id !== productId);
+    setCoffees(productFiltered);
+    setQuantityProducts(productFiltered.length);
+  }
+
   return (
     <PurchasesContext.Provider
       value={{
         quantityProducts,
         productsOnCart: coffees,
         addProductOnCart,
+        changeQuantityOfProduct: changeQuantityProduct,
+        removeProduct,
       }}
     >
       {children}

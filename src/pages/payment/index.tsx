@@ -29,12 +29,22 @@ import { useTheme } from "styled-components";
 import { useContext } from "react";
 import { PurchasesContext } from "../../context/PurchasesContext";
 
+import { formatCurrencyToBRL } from "../../utils/format/currency";
+
 export function Payment() {
-  const { productsOnCart } = useContext(PurchasesContext);
-  const handleIncreaseQuantity = () => {};
-  const handleDecreaseQuantity = () => {};
+  const { productsOnCart, changeQuantityOfProduct, removeProduct } =
+    useContext(PurchasesContext);
+  const handleIncreaseQuantity = (productId: string) =>
+    changeQuantityOfProduct({ productId, quantity: 1 });
+  const handleDecreaseQuantity = (productId: string) =>
+    changeQuantityOfProduct({ productId, quantity: -1 });
 
   const colors = useTheme();
+
+  const totalOfCost = productsOnCart.reduce(
+    (acc, coffee) => (acc += coffee.price * coffee.quantity),
+    0
+  );
 
   return (
     <Container>
@@ -151,20 +161,20 @@ export function Payment() {
                     <div>
                       <Quantity>
                         <Minus
-                          onClick={handleDecreaseQuantity}
+                          onClick={() => handleDecreaseQuantity(coffee.id)}
                           weight={"bold"}
                           color={colors["purple-500"]}
                           size={16}
                         />
                         <span>{coffee.quantity}</span>
                         <Plus
-                          onClick={handleIncreaseQuantity}
+                          onClick={() => handleIncreaseQuantity(coffee.id)}
                           weight={"bold"}
                           color={colors["purple-500"]}
                           size={16}
                         />
                       </Quantity>
-                      <ButtonRemove>
+                      <ButtonRemove onClick={() => removeProduct(coffee.id)}>
                         <Trash
                           size={16}
                           weight={"regular"}
@@ -189,15 +199,15 @@ export function Payment() {
           <PurchaseInformationContainer>
             <div>
               <span>Total de itens</span>
-              <span>R$ 19,89</span>
+              <span>{formatCurrencyToBRL(totalOfCost)}</span>
             </div>
             <div>
               <span>Entrega</span>
-              <span>R$ 19,89</span>
+              <span>{formatCurrencyToBRL(3.8)}</span>
             </div>
             <div>
               <span>Total</span>
-              <span>R$ 19,89</span>
+              <span>{formatCurrencyToBRL(totalOfCost + 3.8)}</span>
             </div>
           </PurchaseInformationContainer>
           <SubmitButton>Confirmar pedido</SubmitButton>

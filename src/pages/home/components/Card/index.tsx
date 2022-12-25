@@ -11,6 +11,7 @@ import {
 
 import { Minus, Plus, ShoppingCart } from "phosphor-react";
 import { useTheme } from "styled-components";
+import { useState } from "react";
 
 interface CoffeeType {
   typeText: string;
@@ -33,7 +34,13 @@ export function Card({
   price,
   image,
 }: CardProps) {
+  const [coffeeQuantity, setCoffeeQuantity] = useState<number>(1);
+
   const colors = useTheme();
+
+  const handleIncreaseQuantity = () => setCoffeeQuantity((state) => state + 1);
+  const handleDecreaseQuantity = () =>
+    setCoffeeQuantity((state) => (state > 1 ? state - 1 : state));
 
   return (
     <CardContainer>
@@ -55,9 +62,19 @@ export function Card({
         </Price>
         <CardActionContainer>
           <ButtonQuantity>
-            <Minus weight={"bold"} color={colors["purple-500"]} size={16} />
-            <span>1</span>
-            <Plus weight={"bold"} color={colors["purple-500"]} size={16} />
+            <Minus
+              onClick={handleDecreaseQuantity}
+              weight={"bold"}
+              color={colors["purple-500"]}
+              size={16}
+            />
+            <span>{coffeeQuantity}</span>
+            <Plus
+              onClick={handleIncreaseQuantity}
+              weight={"bold"}
+              color={colors["purple-500"]}
+              size={16}
+            />
           </ButtonQuantity>
           <ShoppingCardButton>
             <ShoppingCart

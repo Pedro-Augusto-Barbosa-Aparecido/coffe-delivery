@@ -135,6 +135,7 @@ export const ButtonQuantity = styled.div`
 
   & > svg:hover {
     cursor: pointer;
+    fill: ${(props) => props.theme["purple-800"]};
   }
 `;
 

@@ -10,6 +10,7 @@ import logo from "../../assets/logo.svg";
 import { useTheme } from "styled-components";
 import { useContext } from "react";
 import { PurchasesContext } from "../../context/PurchasesContext";
+import { NavLink } from "react-router-dom";
 
 export function Header() {
   const { quantityProducts } = useContext(PurchasesContext);
@@ -17,22 +18,26 @@ export function Header() {
 
   return (
     <HeaderContainer>
-      <img src={logo} alt={""} />
+      <NavLink to={"/"}>
+        <img src={logo} alt={""} />
+      </NavLink>
       <div>
         <Location>
           <MapPin weight={"fill"} size={20} />
           <span>Pouso Alegre, MG</span>
         </Location>
-        <PurchasesContainer>
-          <ShoppingCart
-            weight={"fill"}
-            size={20}
-            color={colors["yellow-700"]}
-          />
-          {quantityProducts > 0 && (
-            <QuantityOnCart>{quantityProducts}</QuantityOnCart>
-          )}
-        </PurchasesContainer>
+        <NavLink to={"/payment"}>
+          <PurchasesContainer>
+            <ShoppingCart
+              weight={"fill"}
+              size={20}
+              color={colors["yellow-700"]}
+            />
+            {quantityProducts > 0 && (
+              <QuantityOnCart>{quantityProducts}</QuantityOnCart>
+            )}
+          </PurchasesContainer>
+        </NavLink>
       </div>
     </HeaderContainer>
   );

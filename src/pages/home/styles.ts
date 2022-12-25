@@ -60,3 +60,36 @@ export const Title = styled.div`
     color: ${(props) => props.theme["gray-800"]};
   }
 `;
+
+export const CoffeeList = styled.section`
+  padding: 2rem 10rem;
+
+  display: flex;
+  flex-direction: column;
+
+  justify-content: flex-start;
+  align-items: flex-start;
+
+  gap: 3.375rem;
+
+  & > div {
+    height: fit-content;
+    width: 100%;
+
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+
+    grid-row-gap: 2.5rem;
+    grid-column-gap: 2.5rem;
+  }
+
+  & > span {
+    font-family: "Baloo 2", sans-serif;
+    font-style: normal;
+    font-weight: 800;
+    font-size: 2rem;
+    line-height: 130%;
+
+    color: ${(props) => props.theme["gray-800"]};
+  }
+`;

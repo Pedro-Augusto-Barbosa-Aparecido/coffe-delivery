@@ -3,9 +3,10 @@ import {
   CoffeeContainer,
   CoffeePrice,
   CoffeeSelectedContainer,
-  Container,
+  FormContainer,
   PaymentContainer,
   PaymentWayBody,
+  PaymentWayBodyGroup,
   PaymentWayContainer,
   PaymentWayInputContainer,
   PaymentWayInputContainerGroup,
@@ -25,11 +26,28 @@ import {
   Plus,
   Trash,
 } from "phosphor-react";
-import { useTheme } from "styled-components";
 import { useContext } from "react";
+import { useTheme } from "styled-components";
 import { PurchasesContext } from "../../context/PurchasesContext";
 
 import { formatCurrencyToBRL } from "../../utils/format/currency";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, useForm } from "react-hook-form";
+import * as z from "zod";
+
+const purchaseSchema = z.object({
+  cep: z.string().min(1, "Digite seu CEP"),
+  street: z.string().min(1, "Digite o nome da sua rua"),
+  number: z.string().min(1, "Digite o número da sua casa"),
+  complement: z.string().optional(),
+  district: z.string().min(1, "Digite o nome do seu bairro"),
+  city: z.string().min(1, "Digite o nome da sua cidade"),
+  uf: z.string().min(1, "Digite a sigla do seu estado"),
+  paymentWay: z.enum(["credit", "debit", "money"]),
+});
+
+type purchaseSchemaType = z.infer<typeof purchaseSchema>;
 
 export function Payment() {
   const { productsOnCart, changeQuantityOfProduct, removeProduct } =
@@ -40,14 +58,31 @@ export function Payment() {
     changeQuantityOfProduct({ productId, quantity: -1 });
 
   const colors = useTheme();
+  const { register, handleSubmit, control, watch } =
+    useForm<purchaseSchemaType>({
+      resolver: zodResolver(purchaseSchema),
+    });
 
   const totalOfCost = productsOnCart.reduce(
     (acc, coffee) => (acc += coffee.price * coffee.quantity),
     0
   );
 
+  const shipping = 3.8;
+  const total = shipping + totalOfCost;
+
+  const cepContent = watch("cep") ?? "";
+  const cepValue = cepContent
+    ?.replace(/\D/g, "")
+    ?.replace(/(\d{5})(\d)/, "$1-$2")
+    ?.replace(/(-\d{3})\d+?$/, "$1");
+
+  function handleConfirmPurchases(purchaseInformation: purchaseSchemaType) {
+    console.log({ ...purchaseInformation, totalOfCost, shipping, total });
+  }
+
   return (
-    <Container>
+    <FormContainer onSubmit={handleSubmit(handleConfirmPurchases)}>
       <PaymentContainer>
         <span>Complete seu pedido</span>
         <PaymentWayContainer>
@@ -64,26 +99,37 @@ export function Payment() {
           </PaymentWayTitle>
           <PaymentWayBody orientation={"column"}>
             <PaymentWayInputContainer size={"medium"}>
-              <input type="text" name="cep" id="cep" placeholder="CEP" />
+              <input
+                type="text"
+                id="cep"
+                placeholder="CEP"
+                value={cepValue}
+                {...register("cep")}
+              />
             </PaymentWayInputContainer>
             <PaymentWayInputContainer size={"full"}>
-              <input type="text" name="street" id="street" placeholder="rua" />
+              <input
+                type="text"
+                id="street"
+                placeholder="rua"
+                {...register("street")}
+              />
             </PaymentWayInputContainer>
             <PaymentWayInputContainerGroup>
               <PaymentWayInputContainer style={{ flex: 1 }} size={"medium"}>
                 <input
                   type="text"
-                  name="number"
                   id="number"
                   placeholder="número"
+                  {...register("number")}
                 />
               </PaymentWayInputContainer>
               <PaymentWayInputContainer style={{ flex: 2 }} size={"full"}>
                 <input
                   type="text"
-                  name="complement"
                   id="complement"
                   placeholder="complemento"
+                  {...register("complement")}
                 />
                 <span>Opcional</span>
               </PaymentWayInputContainer>
@@ -92,16 +138,26 @@ export function Payment() {
               <PaymentWayInputContainer style={{ flex: 2 }} size={"medium"}>
                 <input
                   type="text"
-                  name="district"
                   id="district"
                   placeholder="bairro"
+                  {...register("district")}
                 />
               </PaymentWayInputContainer>
               <PaymentWayInputContainer style={{ flex: 3 }} size={"full"}>
-                <input type="text" name="city" id="city" placeholder="cidade" />
+                <input
+                  type="text"
+                  id="city"
+                  placeholder="cidade"
+                  {...register("city")}
+                />
               </PaymentWayInputContainer>
               <PaymentWayInputContainer style={{ flex: 1 }} size={"small"}>
-                <input type="text" name="uf" id="uf" placeholder="UF" />
+                <input
+                  type="text"
+                  id="uf"
+                  placeholder="UF"
+                  {...register("uf")}
+                />
               </PaymentWayInputContainer>
             </PaymentWayInputContainerGroup>
           </PaymentWayBody>
@@ -120,32 +176,43 @@ export function Payment() {
               </p>
             </div>
           </PaymentWayTitle>
-          <PaymentWayBody orientation={"row"}>
-            <PaymentWayOption>
-              <CreditCard
-                weight={"regular"}
-                size={20}
-                color={colors["purple-500"]}
-              />
-              <span>cartão de crédito</span>
-            </PaymentWayOption>
-            <PaymentWayOption>
-              <CreditCard
-                weight={"regular"}
-                size={20}
-                color={colors["purple-500"]}
-              />
-              <span>cartão de débito</span>
-            </PaymentWayOption>
-            <PaymentWayOption>
-              <CreditCard
-                weight={"regular"}
-                size={20}
-                color={colors["purple-500"]}
-              />
-              <span>dinheiro</span>
-            </PaymentWayOption>
-          </PaymentWayBody>
+          <Controller
+            control={control}
+            name="paymentWay"
+            render={({ field }) => {
+              return (
+                <PaymentWayBodyGroup
+                  onValueChange={field.onChange}
+                  value={field.value}
+                >
+                  <PaymentWayOption value="credit">
+                    <CreditCard
+                      weight={"regular"}
+                      size={20}
+                      color={colors["purple-500"]}
+                    />
+                    <span>cartão de crédito</span>
+                  </PaymentWayOption>
+                  <PaymentWayOption value="debit">
+                    <CreditCard
+                      weight={"regular"}
+                      size={20}
+                      color={colors["purple-500"]}
+                    />
+                    <span>cartão de débito</span>
+                  </PaymentWayOption>
+                  <PaymentWayOption value="money">
+                    <CreditCard
+                      weight={"regular"}
+                      size={20}
+                      color={colors["purple-500"]}
+                    />
+                    <span>dinheiro</span>
+                  </PaymentWayOption>
+                </PaymentWayBodyGroup>
+              );
+            }}
+          />
         </PaymentWayContainer>
       </PaymentContainer>
       <PaymentContainer>
@@ -203,16 +270,16 @@ export function Payment() {
             </div>
             <div>
               <span>Entrega</span>
-              <span>{formatCurrencyToBRL(3.8)}</span>
+              <span>{formatCurrencyToBRL(shipping)}</span>
             </div>
             <div>
               <span>Total</span>
-              <span>{formatCurrencyToBRL(totalOfCost + 3.8)}</span>
+              <span>{formatCurrencyToBRL(total)}</span>
             </div>
           </PurchaseInformationContainer>
           <SubmitButton>Confirmar pedido</SubmitButton>
         </CoffeeSelectedContainer>
       </PaymentContainer>
-    </Container>
+    </FormContainer>
   );
 }

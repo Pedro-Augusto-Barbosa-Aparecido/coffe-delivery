@@ -14,6 +14,8 @@ import { useTheme } from "styled-components";
 import { useContext, useState } from "react";
 import { PurchasesContext } from "../../../../context/PurchasesContext";
 
+import { formatCurrencyToBRL } from "../../../../utils/format/currency";
+
 interface CoffeeType {
   typeText: string;
   id: string;
@@ -56,13 +58,7 @@ export function Card({
       <span>{title}</span>
       <p>{description}</p>
       <Purchase>
-        <Price>
-          {Intl.NumberFormat("pt-BR", {
-            currency: "BRL",
-            style: "currency",
-            minimumFractionDigits: 2,
-          }).format(price)}
-        </Price>
+        <Price>{formatCurrencyToBRL(price)}</Price>
         <CardActionContainer>
           <ButtonQuantity>
             <Minus

@@ -1,7 +1,9 @@
 import styled, { css } from "styled-components";
 import { ButtonQuantity, Price } from "../home/components/Card/styles";
 
-export const Container = styled.main`
+import * as Radio from "@radix-ui/react-radio-group";
+
+export const FormContainer = styled.form`
   padding: 2.5rem 10rem 15rem;
 
   width: 100%;
@@ -110,6 +112,19 @@ export const PaymentWayBody = styled.div<PaymentWayBodyProps>`
   gap: 1rem;
 `;
 
+export const PaymentWayBodyGroup = styled(Radio.Root)`
+  width: 100%;
+  height: fit-content;
+
+  display: flex;
+  flex-direction: row;
+
+  justify-content: flex-start;
+  align-items: flex-start;
+
+  gap: 1rem;
+`;
+
 interface PaymentWayInputContainerProps {
   size: "full" | "medium" | "small" | "max";
 }
@@ -197,11 +212,7 @@ export const PaymentWayInputContainerGroup = styled.div`
   gap: 0.75rem;
 `;
 
-interface PaymentWayOptionProps {
-  selected?: boolean;
-}
-
-export const PaymentWayOption = styled.button<PaymentWayOptionProps>`
+export const PaymentWayOption = styled(Radio.Item)`
   width: fit-content;
   min-width: 11.25rem;
 
@@ -241,12 +252,10 @@ export const PaymentWayOption = styled.button<PaymentWayOptionProps>`
     color: ${(props) => props.theme["gray-800"]};
   }
 
-  ${(props) =>
-    props.selected &&
-    css`
-      background-color: ${props.theme["purple-200"]};
-      border: 2px solid ${props.theme["purple-800"]};
-    `}
+  &[data-state="checked"] {
+    background-color: ${(props) => props.theme["purple-200"]};
+    border: 2px solid ${(props) => props.theme["purple-800"]};
+  }
 `;
 
 export const CoffeeSelectedContainer = styled.div`

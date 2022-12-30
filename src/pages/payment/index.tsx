@@ -48,12 +48,16 @@ const purchaseSchema = z.object({
   paymentWay: z.enum(["credit", "debit", "money"]),
 });
 
-type purchaseSchemaType = z.infer<typeof purchaseSchema>;
+export type purchaseSchemaType = z.infer<typeof purchaseSchema>;
 
 export function Payment() {
   const navigate = useNavigate();
-  const { productsOnCart, changeQuantityOfProduct, removeProduct } =
-    useContext(PurchasesContext);
+  const {
+    productsOnCart,
+    changeQuantityOfProduct,
+    removeProduct,
+    makePurchase,
+  } = useContext(PurchasesContext);
   const handleIncreaseQuantity = (productId: string) =>
     changeQuantityOfProduct({ productId, quantity: 1 });
   const handleDecreaseQuantity = (productId: string) =>
@@ -80,7 +84,21 @@ export function Payment() {
     ?.replace(/(-\d{3})\d+?$/, "$1");
 
   function handleConfirmPurchases(purchaseInformation: purchaseSchemaType) {
-    console.log({ ...purchaseInformation, totalOfCost, shipping, total });
+    const purchaseId = makePurchase({
+      cep: purchaseInformation.cep,
+      complement: purchaseInformation.complement,
+      city: purchaseInformation.city,
+      district: purchaseInformation.district,
+      number: purchaseInformation.number,
+      paymentWay: purchaseInformation.paymentWay,
+      street: purchaseInformation.street,
+      uf: purchaseInformation.uf,
+      totalOfCost,
+      total,
+      shipping,
+    });
+
+    navigate(`/payment/success/${purchaseId}`);
   }
 
   useEffect(() => {

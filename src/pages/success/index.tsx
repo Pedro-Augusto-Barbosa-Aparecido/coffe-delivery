@@ -10,9 +10,36 @@ import { CurrencyDollar, MapPin, Timer } from "phosphor-react";
 
 import deliveryImage from "../../assets/delivery-image.svg";
 import { useTheme } from "styled-components";
+import { useNavigate, useParams } from "react-router-dom";
+import { Coffee, PurchaseInformation } from "../../context/PurchasesContext";
+import { useEffect, useState } from "react";
+
+type PurchaseOnLocalStorage = PurchaseInformation & {
+  coffees: Coffee[];
+  purchase: string;
+};
 
 export function SuccessPurchase() {
+  const [purchaseInformation, setPurchaseInformation] =
+    useState<PurchaseOnLocalStorage | null>(null);
+  const { purchase_id: purchaseID } = useParams();
+  const navigate = useNavigate();
   const colors = useTheme();
+
+  useEffect(() => {
+    if (purchaseID) {
+      const purchase = localStorage.getItem(
+        `@coffee-delivery-product-${purchaseID}`
+      );
+
+      if (!purchase) navigate("/");
+
+      const purchaseObject: PurchaseOnLocalStorage = JSON.parse(purchase!);
+
+      if (purchaseID !== purchaseObject.purchase) navigate("/");
+      setPurchaseInformation(purchaseObject);
+    } else navigate("/");
+  }, [navigate, purchaseID]);
 
   return (
     <Container>
@@ -30,9 +57,15 @@ export function SuccessPurchase() {
               </IconContainer>
               <div>
                 <span>
-                  Entrega em <strong>Rua João Daniel Martinelli, 102</strong>
+                  Entrega em{" "}
+                  <strong>
+                    {purchaseInformation?.street}, {purchaseInformation?.number}
+                  </strong>
                 </span>
-                <span>Farrapos - Porto Alegre, RS</span>
+                <span>
+                  {purchaseInformation?.district} - {purchaseInformation?.city},{" "}
+                  {purchaseInformation?.uf}
+                </span>
               </div>
             </OrderInformation>
             <OrderInformation>
@@ -42,7 +75,7 @@ export function SuccessPurchase() {
               <div>
                 <span>Previsão de entrega</span>
                 <span>
-                  <strong>20 min - 30 min </strong>
+                  <strong>20 min - 30 min</strong>
                 </span>
               </div>
             </OrderInformation>
@@ -57,7 +90,7 @@ export function SuccessPurchase() {
               <div>
                 <span>Pagamento na entrega</span>
                 <span>
-                  <strong>Cartão de Crédito</strong>
+                  <strong>{purchaseInformation?.paymentWay}</strong>
                 </span>
               </div>
             </OrderInformation>

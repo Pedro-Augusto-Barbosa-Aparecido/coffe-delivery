@@ -26,7 +26,7 @@ import {
   Plus,
   Trash,
 } from "phosphor-react";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { useTheme } from "styled-components";
 import { PurchasesContext } from "../../context/PurchasesContext";
 
@@ -35,6 +35,7 @@ import { formatCurrencyToBRL } from "../../utils/format/currency";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
+import { useNavigate } from "react-router-dom";
 
 const purchaseSchema = z.object({
   cep: z.string().min(1, "Digite seu CEP"),
@@ -50,6 +51,7 @@ const purchaseSchema = z.object({
 type purchaseSchemaType = z.infer<typeof purchaseSchema>;
 
 export function Payment() {
+  const navigate = useNavigate();
   const { productsOnCart, changeQuantityOfProduct, removeProduct } =
     useContext(PurchasesContext);
   const handleIncreaseQuantity = (productId: string) =>
@@ -80,6 +82,10 @@ export function Payment() {
   function handleConfirmPurchases(purchaseInformation: purchaseSchemaType) {
     console.log({ ...purchaseInformation, totalOfCost, shipping, total });
   }
+
+  useEffect(() => {
+    if (productsOnCart.length === 0) navigate("/");
+  }, [productsOnCart, navigate]);
 
   return (
     <FormContainer onSubmit={handleSubmit(handleConfirmPurchases)}>

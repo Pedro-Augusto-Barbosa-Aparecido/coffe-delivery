@@ -26,18 +26,28 @@ export function Header() {
           <MapPin weight={"fill"} size={20} />
           <span>Pouso Alegre, MG</span>
         </Location>
-        <NavLink to={"/payment"}>
-          <PurchasesContainer>
+        {quantityProducts ? (
+          <NavLink to={"/payment"}>
+            <PurchasesContainer>
+              <ShoppingCart
+                weight={"fill"}
+                size={20}
+                color={colors["yellow-700"]}
+              />
+              {quantityProducts > 0 && (
+                <QuantityOnCart>{quantityProducts}</QuantityOnCart>
+              )}
+            </PurchasesContainer>
+          </NavLink>
+        ) : (
+          <PurchasesContainer style={{ cursor: "default" }}>
             <ShoppingCart
               weight={"fill"}
               size={20}
               color={colors["yellow-700"]}
             />
-            {quantityProducts > 0 && (
-              <QuantityOnCart>{quantityProducts}</QuantityOnCart>
-            )}
           </PurchasesContainer>
-        </NavLink>
+        )}
       </div>
     </HeaderContainer>
   );
